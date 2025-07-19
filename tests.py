@@ -12,6 +12,7 @@ t3 = run_python_file("calculator", "tests.py")
 t4 = run_python_file("calculator", "../main.py")
 t5 = run_python_file("calculator", "nonexistent.py")
 
+
 print(t1)
 print(t2)
 print(t3)
@@ -26,7 +27,7 @@ def getResults(directory, text):
 
     return f"Result for '{directory}' directory:\n" + text
 
-print(getResults(".", t1))
+# print(getResults(".", t1))
 # print(getResults("pkg", t2))
 # print(getResults("/bin", t3))
 # print(getResults("../", t4))
