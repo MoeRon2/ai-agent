@@ -122,38 +122,61 @@ def main():
     print("Hello from ai-agent!")
     # Juicy part
     client = create_client()
-    response = client.models.generate_content(
-    model='gemini-2.0-flash-001',
-    contents=messages,
-    config=types.GenerateContentConfig(tools=[available_functions],system_instruction=system_prompt)
-    )
-    for candidate in response.candidates:
-        messages.append(candidate.content)
-    
-    prompt_tokens = response.usage_metadata.prompt_token_count
-    response_tokens = response.usage_metadata.candidates_token_count
 
+    for i in range(20):
+        try:
+            response = client.models.generate_content(
+            model='gemini-2.0-flash-001',
+            contents=messages,
+            config=types.GenerateContentConfig(tools=[available_functions],system_instruction=system_prompt)
+            )
 
-    # Output handling
-    if not response.function_calls:
-        return response.text
-
-    for function_call_part in response.function_calls:
-        result = call_function(function_call_part, verbose=verbose_flag)
-        if not result.parts[0].function_response.response:
-            raise Exception("No response found")
-        messages.append(result)
-        if verbose_flag:
-            print(f"-> {result.parts[0].function_response.response['result']}")
-        else:
-             print(result.parts[0].function_response.response["result"])
+            for candidate in response.candidates:
+                messages.append(candidate.content)
 
             
+            
+        # If no function calls, we're also done
+            if response.function_calls:
+            
+                for function_call_part in response.function_calls:
+                    result = call_function(function_call_part, verbose=verbose_flag)
+                    if not result.parts[0].function_response.response:
+                        raise Exception("No response found")
+                    messages.append(result)
+                    if verbose_flag:
+                        print(f"-> {result.parts[0].function_response.response['result']}")
+                    else:
+                        print(result.parts[0].function_response.response["result"])
 
-    if verbose_flag:
-        print(f"User prompt: {user_prompt}")
-        print(f"Prompt tokens: {prompt_tokens}")
-        print(f"Response tokens: {response_tokens}")
+            elif response.text:
+                print("Final response:")
+                print(response.text)
+                break
+            else:
+                break
+        except Exception as e:
+            print(f"Error: {e}")
+            break
+
+        
+    
+
+
+
+   
+    
+    # prompt_tokens = response.usage_metadata.prompt_token_count
+    # response_tokens = response.usage_metadata.candidates_token_count
+
+
+    
+            
+
+    # if verbose_flag:
+    #     print(f"User prompt: {user_prompt}")
+    #     print(f"Prompt tokens: {prompt_tokens}")
+    #     print(f"Response tokens: {response_tokens}")
 
 
 
